@@ -1,10 +1,16 @@
-
 # ====================================
 # INTEGRATION GUIDE FOR SAVING PLAY DATA
 # ====================================
 
-# 1. Add this import to your main music playing file (usually play.py or similar)
+# Add these imports at the top of the file
+from pyrogram import filters
+from AnonXMusic import app
+from AnonXMusic.misc import SUDOERS
 from AnonXMusic.plugins.tools.stats import increment_group_play_count, save_play_data
+
+# ====================================
+# 1. Add this import to your main music playing file (usually play.py or similar)
+# from AnonXMusic.plugins.tools.stats import increment_group_play_count, save_play_data
 
 # ====================================
 # 2. FIND YOUR MUSIC PLAYING FUNCTION
