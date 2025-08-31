@@ -6,6 +6,7 @@ from typing import Dict, List, Union
 from AnonXMusic import userbot
 from AnonXMusic.core.mongo import mongodb
 
+groupstatsdb = mongodb.groupstats
 authdb = mongodb.adminauth
 authuserdb = mongodb.authuser
 autoenddb = mongodb.autoend
@@ -42,6 +43,7 @@ pause = {}
 playmode = {}
 playtype = {}
 skipmode = {}
+groupstats = {}
 
 
 async def get_assistant_number(chat_id: int) -> str:
@@ -666,3 +668,64 @@ async def remove_banned_user(user_id: int):
     if not is_gbanned:
         return
     return await blockeddb.delete_one({"user_id": user_id})
+
+async def get_group_stats(chat_id: int) -> dict:
+    """Get group statistics including song count, user count, etc."""
+    stats = groupstats.get(chat_id)
+    if not stats:
+        db_stats = await groupstatsdb.find_one({"chat_id": chat_id})
+        if not db_stats:
+            # Initialize new group stats
+            stats = {
+                "chat_id": chat_id,
+                "songs_played": 0,
+                "total_users": 0,
+                "chat_title": "",
+                "last_played": None
+            }
+            groupstats[chat_id] = stats
+            await groupstatsdb.insert_one(stats)
+            return stats
+        else:
+            groupstats[chat_id] = db_stats
+            return db_stats
+    return stats
+
+async def increment_song_count(chat_id: int, chat_title: str = ""):
+    """Increment song count for a group"""
+    stats = await get_group_stats(chat_id)
+    stats["songs_played"] += 1
+    stats["last_played"] = datetime.now()
+    if chat_title:
+        stats["chat_title"] = chat_title
+    
+    groupstats[chat_id] = stats
+    await groupstatsdb.update_one(
+        {"chat_id": chat_id},
+        {"$set": stats},
+        upsert=True
+    )
+
+async def update_group_user_count(chat_id: int, user_count: int, chat_title: str = ""):
+    """Update user count for a group"""
+    stats = await get_group_stats(chat_id)
+    stats["total_users"] = user_count
+    if chat_title:
+        stats["chat_title"] = chat_title
+    
+    groupstats[chat_id] = stats
+    await groupstatsdb.update_one(
+        {"chat_id": chat_id},
+        {"$set": stats},
+        upsert=True
+    )
+
+async def get_top_groups(limit: int = 10) -> list:
+    """Get top groups by song count"""
+    cursor = groupstatsdb.find({"chat_id": {"$lt": 0}}).sort("songs_played", -1).limit(limit)
+    top_groups = []
+    async for group in cursor:
+        top_groups.append(group)
+    return top_groups
+
+
