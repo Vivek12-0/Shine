@@ -35,26 +35,13 @@ def stream_markup_timer(_, chat_id, played, dur):
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
     anon = math.floor(percentage)
-    if 0 < anon <= 10:
-        ba = "⚪─────────"
-    elif 10 < anon < 20:
-        ba = "━⚪────────"
-    elif 20 <= anon < 30:
-        ba = "━━⚪───────"
-    elif 30 <= anon < 40:
-        ba = "━━━⚪──────"
-    elif 40 <= anon < 50:
-        ba = "━━━━⚪─────"
-    elif 50 <= anon < 60:
-        ba = "━━━━━⚪────"
-    elif 60 <= anon < 70:
-        ba = "━━━━━━⚪───"
-    elif 70 <= anon < 80:
-        ba = "━━━━━━━⚪──"
-    elif 80 <= anon < 95:
-        ba = "━━━━━━━━⚪─"
-    else:
-        ba = "━━━━━━━━━⚪﻿"
+    
+    progress_bars = [
+        "⚪─────────", "━⚪────────", "━━⚪───────", "━━━⚪──────", "━━━━⚪─────",
+        "━━━━━⚪────", "━━━━━━⚪───", "━━━━━━━⚪──", "━━━━━━━━⚪─", "━━━━━━━━━⚪﻿"
+    ]
+    
+    ba = progress_bars[min(anon // 10, 9)]
 ##bar of wynk---------------------------------------
     
     
@@ -67,8 +54,13 @@ def stream_markup_timer(_, chat_id, played, dur):
             )
         ],
         [
-            
-            InlineKeyboardButton(text="❚❚ ", callback_data=f"ADMIN Pause|{chat_id}"),
+            InlineKeyboardButton(text="⏪ 20s", callback_data=f"ADMIN SeekBack20|{chat_id}"),
+            InlineKeyboardButton(text="⏪ 10s", callback_data=f"ADMIN SeekBack10|{chat_id}"),
+            InlineKeyboardButton(text="❚❚", callback_data=f"ADMIN Pause|{chat_id}"),
+            InlineKeyboardButton(text="10s ⏩", callback_data=f"ADMIN Seek10|{chat_id}"),
+            InlineKeyboardButton(text="20s ⏩", callback_data=f"ADMIN Seek20|{chat_id}"),
+        ],
+        [
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"), 
             InlineKeyboardButton(
                 text="|►►", callback_data=f"ADMIN Skip|{chat_id}"
