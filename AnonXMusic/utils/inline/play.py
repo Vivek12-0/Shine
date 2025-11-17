@@ -4,7 +4,8 @@ from pyrogram.types import InlineKeyboardButton
 
 from AnonXMusic.utils.formatters import time_to_seconds
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
+import config
+from AnonXMusic import app
 
 
 
@@ -61,10 +62,9 @@ def stream_markup_timer(_, chat_id, played, dur):
             InlineKeyboardButton(text="20s ▷", callback_data=f"seek {chat_id} 20"),
         ],
         [
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"), 
-            InlineKeyboardButton(
-                text="𝑺𝒌𝒊𝒑", callback_data=f"ADMIN Skip|{chat_id}"
-            ),
+            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),       InlineKeyboardButton(
+                text=_["S_B_1"], url=f"https://t.me/{app.username}?startgroup=true"
+            ),   
         ],
         
         # [
